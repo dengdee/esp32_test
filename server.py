@@ -11,7 +11,7 @@ async def test():
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
-    save_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    save_path = os.path.join(uploads, file.filename)
     
     with open(save_path, "wb") as f:
         content = await file.read()
