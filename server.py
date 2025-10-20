@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, Form
+from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse, PlainTextResponse
 import uvicorn
 import os
