@@ -5,9 +5,6 @@ import os
 
 app = FastAPI()
 
-# 建立 uploads 資料夾（若不存在）
-os.makedirs("uploads", exist_ok=True)
-
 @app.get("/test")
 async def test():
     return PlainTextResponse("OK")
@@ -21,17 +18,11 @@ async def upload_data(value: float = Form(...)):
 async def upload_file(file: UploadFile):
     content = await file.read()
     filename = file.filename
+    os.makedirs("uploads", exist_ok=True)
     with open(f"uploads/{filename}", "wb") as f:
         f.write(content)
-    print(f"Saved file: {filename}, size: {len(content)} bytes")
     return {"status": "ok", "filename": filename}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-
-
-
-# pip install fastapi uvicorn
-# pip install python-multipart
-# mkdir uploads
-# python server.py
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
