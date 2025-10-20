@@ -9,6 +9,10 @@ app = FastAPI()
 async def test():
     return PlainTextResponse("OK")
 
+# 設定上傳資料夾
+uploads = "uploads"
+os.makedirs(uploads, exist_ok=True)  # 若資料夾不存在就建立
+
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
     save_path = os.path.join(uploads, file.filename)
