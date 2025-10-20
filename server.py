@@ -9,19 +9,16 @@ app = FastAPI()
 async def test():
     return PlainTextResponse("OK")
 
-@app.post("/upload_data")
-async def upload_data(value: float = Form(...)):
-    print(f"Received value: {value}")
-    return JSONResponse(content={"status": "ok", "received": value})
-
-@app.post("/upload_file")
-async def upload_file(file: UploadFile):
-    content = await file.read()
-    filename = file.filename
-    os.makedirs("uploads", exist_ok=True)
-    with open(f"uploads/{filename}", "wb") as f:
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    save_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    
+    with open(save_path, "wb") as f:
+        content = await file.read()
         f.write(content)
-    return {"status": "ok", "filename": filename}
+    
+    print(f"✅ File saved: {save_path} ({len(content)} bytes)")
+    return {"status": "ok", "filename": file.filename, "size": len(content)}
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
