@@ -5,8 +5,10 @@ import os
 import wave
 import json
 from vosk import Model, KaldiRecognizer
-import pyttsx3
 import tempfile
+
+# Coqui TTS
+from TTS.api import TTS
 
 # 初始化 FastAPI
 app = FastAPI()
@@ -73,22 +75,21 @@ async def upload_file(file: UploadFile = File(...)):
     })
 
 
-# ===== 新增 TTS API =====
+# ===== 新增 TTS API（使用 Coqui TTS） =====
+# 安裝 Coqui TTS: pip install TTS
+# 運行時會自動下載模型（第一次）
+tts_model = TTS(model_name="tts_models/zh-CN/baker/tacotron2-DDC")  # 中文 Tacotron2 模型
+
 @app.post("/tts")
 async def tts(text: str = Form(...)):
     try:
-        engine = pyttsx3.init()
-        # 可設定語音速度和音量
-        engine.setProperty('rate', 150)
-        engine.setProperty('volume', 1.0)
-
         # 使用臨時檔存音檔
         tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
         tmp_path = tmp_file.name
         tmp_file.close()
 
-        engine.save_to_file(text, tmp_path)
-        engine.runAndWait()
+        # Coqui TTS 生成 WAV
+        tts_model.tts_to_file(text=text, file_path=tmp_path)
         
         print(f"🔊 TTS generated: {tmp_path}")
 
