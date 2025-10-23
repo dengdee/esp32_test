@@ -1,10 +1,12 @@
-from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi import FastAPI, UploadFile, File, Form
+from fastapi.responses import JSONResponse, PlainTextResponse, FileResponse
 import uvicorn
 import os
 import wave
 import json
 from vosk import Model, KaldiRecognizer
+import pyttsx3
+import tempfile
 
 # 初始化 FastAPI
 app = FastAPI()
@@ -17,13 +19,10 @@ async def test():
 uploads = "uploads"
 os.makedirs(uploads, exist_ok=True)
 
-# 載入 Vosk 模型（請先下載相應語言的模型）
-# 例如中文模型: vosk-model-small-cn-0.22
-# 英文模型: vosk-model-small-en-us-0.15
+# 載入 Vosk 模型
 MODEL_PATH = "vosk-model-small-cn-0.22"
 if not os.path.exists(MODEL_PATH):
     raise RuntimeError("❌ 找不到模型資料夾，請先下載 Vosk 模型並放在相同目錄中。")
-
 model = Model(MODEL_PATH)
 
 @app.post("/upload")
@@ -72,6 +71,31 @@ async def upload_file(file: UploadFile = File(...)):
         "filename": file.filename,
         "text": result_text.strip()
     })
+
+
+# ===== 新增 TTS API =====
+@app.post("/tts")
+async def tts(text: str = Form(...)):
+    try:
+        engine = pyttsx3.init()
+        # 可設定語音速度和音量
+        engine.setProperty('rate', 150)
+        engine.setProperty('volume', 1.0)
+
+        # 使用臨時檔存音檔
+        tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
+        tmp_path = tmp_file.name
+        tmp_file.close()
+
+        engine.save_to_file(text, tmp_path)
+        engine.runAndWait()
+        
+        print(f"🔊 TTS generated: {tmp_path}")
+
+        return FileResponse(tmp_path, media_type="audio/wav", filename="output.wav")
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
