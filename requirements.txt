@@ -1,10 +1,6 @@
+python-multipart
 fastapi
 uvicorn
-python-multipart
-openai
 vosk
-pyttsx3
-sounddevice
-gtts
+gTTS
 pydub
-
