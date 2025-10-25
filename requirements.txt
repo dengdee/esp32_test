@@ -7,5 +7,4 @@ pyttsx3
 sounddevice
 gtts
 pydub
-pyaudioop
 
