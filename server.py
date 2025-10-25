@@ -12,19 +12,20 @@ import tempfile
 # 初始化 FastAPI
 app = FastAPI()
 
-@app.get("/test")
-async def test():
-    return PlainTextResponse("OK")
-
 # 設定上傳資料夾
 uploads = "uploads"
 os.makedirs(uploads, exist_ok=True)
 
 # 載入 Vosk 模型
 MODEL_PATH = "vosk-model-small-cn-0.22"
+# MODEL_PATH = "vosk-model-small-en-us-0.15"
 if not os.path.exists(MODEL_PATH):
     raise RuntimeError("❌ 找不到模型資料夾，請先下載 Vosk 模型並放在相同目錄中。")
 model = Model(MODEL_PATH)
+
+@app.get("/test")
+async def test():
+    return PlainTextResponse("OK")
 
 # ---------- 🎤 語音辨識 ----------
 @app.post("/upload")
