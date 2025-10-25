@@ -5,10 +5,9 @@ import os
 import wave
 import json
 from vosk import Model, KaldiRecognizer
+from gtts import gTTS
+from pydub import AudioSegment
 import tempfile
-
-# Coqui TTS
-from TTS.api import TTS
 
 # 初始化 FastAPI
 app = FastAPI()
@@ -27,24 +26,22 @@ if not os.path.exists(MODEL_PATH):
     raise RuntimeError("❌ 找不到模型資料夾，請先下載 Vosk 模型並放在相同目錄中。")
 model = Model(MODEL_PATH)
 
+# ---------- 🎤 語音辨識 ----------
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
     save_path = os.path.join(uploads, file.filename)
     
-    # 儲存音檔
     with open(save_path, "wb") as f:
         content = await file.read()
         f.write(content)
     
     print(f"✅ File saved: {save_path} ({len(content)} bytes)")
     
-    # 進行語音辨識
     try:
         wf = wave.open(save_path, "rb")
     except Exception as e:
         return JSONResponse({"error": f"無法打開音檔: {e}"}, status_code=400)
 
-    # 檢查音檔格式
     if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getframerate() not in [8000, 16000]:
         return JSONResponse({
             "error": "音檔格式需為 16-bit PCM mono，取樣率 8k 或 16k。"
@@ -75,25 +72,28 @@ async def upload_file(file: UploadFile = File(...)):
     })
 
 
-# ===== 新增 TTS API（使用 Coqui TTS） =====
-# 安裝 Coqui TTS: pip install TTS
-# 運行時會自動下載模型（第一次）
-tts_model = TTS(model_name="tts_models/zh-CN/baker/tacotron2-DDC")  # 中文 Tacotron2 模型
-
+# ---------- 🔊 文字轉語音 (輸出 WAV) ----------
 @app.post("/tts")
-async def tts(text: str = Form(...)):
+async def tts(text: str = Form(...), lang: str = Form("zh")):
     try:
-        # 使用臨時檔存音檔
-        tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
-        tmp_path = tmp_file.name
-        tmp_file.close()
+        # 1️⃣ 先生成暫存 MP3
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_mp3:
+            tts = gTTS(text=text, lang=lang)
+            tts.save(tmp_mp3.name)
+            mp3_path = tmp_mp3.name
 
-        # Coqui TTS 生成 WAV
-        tts_model.tts_to_file(text=text, file_path=tmp_path)
-        
-        print(f"🔊 TTS generated: {tmp_path}")
+        # 2️⃣ 轉換為 WAV
+        wav_path = mp3_path.replace(".mp3", ".wav")
+        sound = AudioSegment.from_mp3(mp3_path)
+        sound.export(wav_path, format="wav")
 
-        return FileResponse(tmp_path, media_type="audio/wav", filename="output.wav")
+        print(f"🎧 已生成語音檔：{wav_path}")
+
+        return FileResponse(
+            wav_path,
+            media_type="audio/wav",
+            filename="speech.wav"
+        )
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
 

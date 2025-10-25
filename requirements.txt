@@ -4,5 +4,6 @@ python-multipart
 openai
 vosk
 pyttsx3
-TTS
 sounddevice
+gtts
+pydub
