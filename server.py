@@ -17,8 +17,8 @@ uploads = "uploads"
 os.makedirs(uploads, exist_ok=True)
 
 # 載入 Vosk 模型
-MODEL_PATH = "vosk-model-small-cn-0.22"
-# MODEL_PATH = "vosk-model-small-en-us-0.15"
+# MODEL_PATH = "vosk-model-small-cn-0.22"
+MODEL_PATH = "vosk-model-small-en-us-0.15"
 if not os.path.exists(MODEL_PATH):
     raise RuntimeError("❌ 找不到模型資料夾，請先下載 Vosk 模型並放在相同目錄中。")
 model = Model(MODEL_PATH)
