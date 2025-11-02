@@ -27,6 +27,26 @@ model = Model(MODEL_PATH)
 async def test():
     return PlainTextResponse("OK")
 
+# ---------- 加法功能 ----------
+@app.get("/add")
+async def add(a: float, b: float):
+    result = a + b
+    print(f"➕ 計算: {a} + {b} = {result}")
+    return JSONResponse({
+        "status": "ok",
+        "a": a,
+        "b": b,
+        "result": result
+    })
+
+# ----------  乘法功能 ----------
+@app.get("/mul/{a}/{b}")
+async def add_path(a: float, b: float):
+    result = a * b
+    return {"status": "ok", "a": a, "b": b, "result": result}
+
+
+
 # ---------- 🎤 語音辨識 ----------
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):

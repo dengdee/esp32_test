@@ -10,6 +10,7 @@
 
 ## 重要連結
 
+* 簡報連結 [https://docs.google.com/presentation/d/1sXBzooZRVFtlOk1QXWgG5a-12z-ez6THPJ5Be3oa82g/edit?usp=sharing](https://docs.google.com/presentation/d/1sXBzooZRVFtlOk1QXWgG5a-12z-ez6THPJ5Be3oa82g/edit?usp=sharing)
 * 上週程式碼連結: [https://github.com/dengdee/114-1NTU_maker_workshop](https://github.com/dengdee/114-1NTU_maker_workshop)
 * AI Studio API 金鑰申請 (Google AI Studio): [https://aistudio.google.com/api-keys](https://aistudio.google.com/api-keys)
 * Github: [https://github.com/](https://github.com/)
@@ -18,7 +19,7 @@
 
 ---
 
-## Postman 測試 Gemini
+## Postman 測試 Gemini API
 
 API Endpoint:
 
@@ -49,6 +50,3 @@ https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generat
 }
 ```
 
----
-
-完成 Markdown 格式整理。
