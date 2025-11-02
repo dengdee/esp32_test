@@ -83,21 +83,24 @@ async def tts(text: str = Form(...), lang: str = Form("zh")):
             tts.save(tmp_mp3.name)
             mp3_path = tmp_mp3.name
 
-        # 2️⃣ 轉換為 WAV
+        # 2️⃣ 轉換為 WAV（符合 vosk 要求）
         wav_path = mp3_path.replace(".mp3", ".wav")
         sound = AudioSegment.from_mp3(mp3_path)
+        sound = sound.set_channels(1)          # 單聲道
+        sound = sound.set_frame_rate(16000)    # 取樣率 16kHz
+        sound = sound.set_sample_width(2)      # 16-bit PCM
         sound.export(wav_path, format="wav")
 
-        print(f"🎧 已生成語音檔：{wav_path}")
+        print(f"🎧 已生成語音檔（符合 Vosk 格式）：{wav_path}")
 
         return FileResponse(
             wav_path,
             media_type="audio/wav",
             filename="speech.wav"
         )
+
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
