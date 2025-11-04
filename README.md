@@ -50,3 +50,27 @@ https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generat
 }
 ```
 
+```json
+{
+  "contents": [
+    {
+      "role": "user",
+      "parts": [
+        { "text": "什麼是LLM" }
+      ]
+    }
+  ],
+  "system_instruction": {
+    "role": "system",
+    "parts": [
+      { "text": "你是一位清楚解釋科技概念的老師。" }
+    ]
+  },
+  "generationConfig": {
+    "temperature": 0.7,
+    "topK": 40,
+    "topP": 0.9,
+    "maxOutputTokens": 5120
+  }
+}
+```
